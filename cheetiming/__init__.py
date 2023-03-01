@@ -1,3 +1,1 @@
-from .timer import timing
-from .timer import timing_data
-from .timer import timing_report
+from .timer import create_timer
