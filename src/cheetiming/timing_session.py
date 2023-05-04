@@ -15,7 +15,7 @@ class TimingSession(object):
             self._start = None
 
     def print_stats(self):
-        return f'{self._calls} calls, {self._elapsed} seconds'
+        return f'{self._calls} call(s), {self._elapsed} seconds'
 
     def __repr__(self):
         return f'Timer: {self._name or "(Unnamed)"}, ' + self.print_stats()
@@ -34,6 +34,7 @@ class TimingSession(object):
         self._calls += n_calls
 
     def update(self, other: TimingSession):
+        self._name = other._name
         self._start = other._start
         self._calls = other._calls
         self._elapsed = other._elapsed

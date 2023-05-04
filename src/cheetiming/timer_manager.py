@@ -57,7 +57,7 @@ class TimerManager:
             for i, sess in enumerate(timing_sessions):
                 s += f' {i + 1}:\t{sess.print_stats()}\n'
             total_of_sessions = TimingSession.aggregate_from_list(timing_sessions)
-            s += f'total:\t{total_of_sessions.print_stats()}\n'
+            s += f'total:\t{total_of_sessions.print_stats()}\n\n'
             return s
 
         if timer_name:

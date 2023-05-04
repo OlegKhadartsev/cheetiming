@@ -1,89 +1,120 @@
-from cheetiming import timing, timing_session, timing_report, iterate_with_timer, range_with_timer, run_with_timer, \
-    timers
+from functools import partial
 
 
-def print_last_timer():
-    print(f'{timing_session.calls} calls')
-    print(f'{timing_session.elapsed} seconds')
+examples = [
+    ("Using as a context manager:",
+     """import time
+from cheetiming import timing
 
-def print_named_timer(timer_name):
-    print(f'timer: {timer_name}\n'
-          f'{timers[timer_name]}')
-    print(f'{timers[timer_name][-1].calls} calls')
-    print(f'{timers[timer_name][-1].elapsed} elapsed')
-
-
-print('Using as context manager:')
 with timing() as t:
-    print('...executing my unnamed code block')
-print('printing the timer as string:')
+    time.sleep(.1)    
 print(t)
-print('printing the timer in custom format:')
-print(f'Elapsed: {t.elapsed} seconds')
+print(t.elapsed)
+"""),
 
+    ("Using as a _named_ context manager:",
+     """import time
+from cheetiming import timing
 
-print('\nUsing as "named" context manager:\n'
-      'Timing stats can be retrieved by code block\'s name')
-with timing('my code block #1') as t:
-    print('...executing my code block #1')
-print('printing the timer as string:')
+with timing('my_named_code_block') as t:
+    time.sleep(.1)    
 print(t)
-print('printing the timer in custom format:')
-print(f'Timer: {t.name} elapsed: {t.elapsed} seconds')
+print(t.name, t.elapsed)
+"""),
+    ('Reusing a _named_ context manager:',
+     """import time
+from cheetiming import timing, timing_report
 
-print('\nReusing a "named" context manager:')
-with timing('my code block #1') as t:
-    print('...executing my code block #1 again...')
-print('printing the timer as string:')
+with timing('my_repeating_code_block') as t:
+    time.sleep(.1)
 print(t)
-print('printing the timer in custom format:')
-print(f'Timer: {t.name} elapsed: {t.elapsed} seconds')
-print('Timing report:')
+with timing('my_repeating_code_block') as t:
+    time.sleep(.1)    
+print(t)
+# print timing_report:
 print(timing_report(t.name))
-
-
-print('Using in for loop:\n'
-      'After the loop timing report is available for the last `iterate_with_timer` call')
+"""),
+    ("Using in a ___for___ loop",
+     """from cheetiming import iterate_with_timer, timing_session
+      
 my_list = [2, 4, 6, 7]
-for item in iterate_with_timer(my_list):
-    print('...retrieving item', item)
-print_last_timer()
-
-
-print('\nUsing in "named" "for" loop with name:\n '
-      'After the loop the `timing_report` is available for the last `iterate_with_timer` call\n'
-      'Timing stats can be retrieved by timer\'s name')
+for i, item in iterate_with_timer(my_list):
+    print(f'loop {i}: retrieving item:{item}')
+print(timing_session)
+print(timing_session.calls, 'calls', timing_session.elapsed, 'sec') 
+"""),
+    ("Using in a _named_ ___for___ loop",
+     """from cheetiming import iterate_with_timer, timing_session, timing_report
+      
 my_list = [2, 4, 6, 7]
-
-timer_name = 'my_list_timer'
-for item in iterate_with_timer(my_list, timer_name):
-    print('...retrieving item', item)
-print_last_timer()
-print_named_timer(timer_name)
-print(timing_report(timer_name))
-
-print('\nUsing in "for" loop to repeat code block `n` times')
+for i, item in iterate_with_timer(my_list, 'my_loop_timer'):
+    print(f'loop {i}: retrieving item:{item}')
+print(timing_session)
+print(timing_report('my_loop_timer'))
+"""),
+    ("Using as a ___range___ -like generator loop to repeat a code block _n_ times",
+     """from cheetiming import range_with_timer, timing_session
+      
 for i in range_with_timer(5):
-    print(f'...executing my code block, run #{i}')
-print_last_timer()
+    print(f'loop {i}')
+print(timing_session)
+print(timing_session.calls, 'calls', timing_session.elapsed, 'sec')
+"""),
+    ("Using as a _named_ ___range___ -like generator loop to repeat a code block _n_ times",
+     """from cheetiming import range_with_timer, timing_session, timing_report
+      
+for i in range_with_timer(5, 'my_range_timer'):
+    print(f'loop {i}')
+print(timing_session)
+print(timing_report('my_range_timer'))
+"""),
+    ("Using as a pseudo- ___range___ -like generator loop to run a code block only __once__\n"
+     "(it brings lower overhead than using a context manager)",
+     """from cheetiming import run_with_timer, timing_session
+      
+for _ in run_with_timer():
+    print('running my code block only once!')
+print(timing_session)
+"""),
+    ("Using as a _named_ pseudo- ___range___ -like generator loop to run a code block only __once__\n"
+     "(it brings lower overhead than using a context manager)",
+     """from cheetiming import run_with_timer, timing_session, timing_report
+      
+for _ in run_with_timer('my_pseudo_range_timer'):
+    print('running my code block only once!')
+print(timing_session)
+print(timing_report('my_pseudo_range_timer'))
+"""),
+    ("Using timing_report to print statistics for all named timers",
+     """from cheetiming import timing_report
 
-print('\nUsing in a "named" "for" loop to repeat code block `n` times\n'
-      'Timing stats can be retrieved by timer\'s name')
-timer_name = "my_range_timer"
-for i in range_with_timer(5, timer_name):
-    print(f'...executing my code block, run #{i}')
-print_last_timer()
-print_named_timer(timer_name)
+# using named timers from the examples above here ...
 
-
-print('\nUsing in a "named" pseudo-"for" loop to run a code block only once:\n'
-      'This method has lower overhead than using a context manager!\n'
-      'Timing stats can be retrieved by timer\'s name')
-timer_name = "my_pseudo_range_timer"
-for _ in run_with_timer(timer_name):  # equivalent to range_with_timer(1)
-    print(f'executing my code block in pseudo-loop (equivalent to `range_with_timer(1)`)')
-print_last_timer()
-print_named_timer(timer_name)
-
-'\nTiming report (all named timers):'
 print(timing_report())
+"""),
+    ("Printing a specific timer's report",
+     """from cheetiming import timing_report
+
+# using named timers from the examples above here ...
+
+print(timing_report('my_repeating_code_block'))
+""")
+
+]
+
+
+def exec_code_with_output(title, source):
+    print('- ' + title)
+    print(f'```python\n{source}```\nOutput:\n```')
+    exec(source)
+    print('```')
+
+
+with open('Usage.md', 'w', encoding='utf8') as f_usage:
+    f_usage.write('')
+with open('Usage.md', 'a', encoding='utf8') as f_usage:
+    print = partial(print, file=f_usage)
+    for example in examples:
+        exec_code_with_output(*example)
+
+
