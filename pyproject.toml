@@ -19,7 +19,6 @@ dependencies = [
 
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
@@ -27,10 +26,10 @@ classifiers = [
 dynamic = ["version"]
 
 [tool.setuptools.dynamic]
-version = {attr = "docgen_mlg.__version__"}
+version = {attr = "cheetiming.__version__"}
 
 [project.urls]
-"Homepage" = "https://tfs.mlg.ru/Medialogia/ds/_git/docgen-mlg"
+"Homepage" = "https://github.com/OlegKhadartsev/cheetiming"
 
 [tool.pytest.ini_options]
 pythonpath = [
