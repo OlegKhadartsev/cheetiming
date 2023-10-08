@@ -104,3 +104,15 @@ timers = default_timer_manager.timers
 named_timer_managers = {}
 
 
+def null_timer_range(name: str = None):
+    """
+    a placeholder for cheetiming.run_with_timer when no timer is instantiated
+    :param name:
+    :return:
+    """
+    for i in range(1):
+        yield i
+
+
+def reset_timers():
+    timers.clear()
