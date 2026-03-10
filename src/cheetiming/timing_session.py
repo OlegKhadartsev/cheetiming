@@ -15,12 +15,23 @@ class TimingSession(object):
             self._start = None
 
     def print_stats(self):
+        """
+        Return a summary of the timing session's call count and elapsed seconds.
+        
+        Returns:
+            stats (str): A string formatted as "<calls> call(s), <elapsed> seconds".
+        """
         return f'{self._calls} call(s), {self._elapsed} seconds'
 
     def __repr__(self):
         return f'Timer: {self._name or "(Unnamed)"}, {self.print_stats()}'
 
     def start(self):
+        """
+        Record the current time as the session start.
+        
+        Sets the session's start timestamp used to measure elapsed time. Calling this again overwrites any previously recorded start time.
+        """
         self._start = timeit.default_timer()
 
     def reset(self):
