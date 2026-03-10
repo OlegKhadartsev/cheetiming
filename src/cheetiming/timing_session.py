@@ -24,12 +24,6 @@ class TimingSession(object):
         return f'{self._calls} call(s), {self._elapsed} seconds'
 
     def __repr__(self):
-        """
-        Provide a string representation of the TimingSession including its name (or "(Unnamed)"), call count, and elapsed time.
-        
-        Returns:
-            str: A string in the format "Timer: <name>, <calls> call(s), <elapsed> seconds".
-        """
         return f'Timer: {self._name or "(Unnamed)"}, {self.print_stats()}'
 
     def start(self):
