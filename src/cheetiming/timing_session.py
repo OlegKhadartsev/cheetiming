@@ -18,7 +18,7 @@ class TimingSession(object):
         return f'{self._calls} call(s), {self._elapsed} seconds'
 
     def __repr__(self):
-        return f'Timer: {self._name or "(Unnamed)"}, ' + self.print_stats()
+        return f'Timer: {self._name or "(Unnamed)"}, {self.print_stats()}'
 
     def start(self):
         self._start = timeit.default_timer()
